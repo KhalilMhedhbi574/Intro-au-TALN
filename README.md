@@ -6,25 +6,31 @@ MHEDHBI Khalil - MABULU Marius
 
 Le projet s'inscrit dans le cadre de la compétition DEFT 2013 et porte sur la classification thématique de documents. Plus précisément, la tâche consiste à assigner automatiquement une catégorie (Entrée, Plat principal ou Dessert) à une recette de cuisine à partir de son titre, de la liste de ses ingrédients, de ses instructions et d'autres données.
 
-**Note** : L'analyse des données et des résultats ainsi que la justification de nos choix se trouvent dans le notebook.
+**Note** : L'analyse des données et des résultats ainsi que la justification de nos choix se trouvent dans le notebook (colab).
 
-**1 ou 2 exemples de documents**
+### Exemple 1
 
-doc_id                                         recette_80405.xml  
-titre                Poitrine de veau aux épices et aux abricots  
-type                                              Plat principal  
-difficulte                                           Très facile  
-cout                                                       Moyen  
-ingredients    - 1,5 kg de poitrine de veau avec les os - 1 g...  
-recette        Dans une cocotte en fonte, faites chauffer l'h...
+| Champ        | Valeur |
+|--------------|--------|
+| doc_id       | recette_80405.xml |
+| titre        | Poitrine de veau aux épices et aux abricots |
+| type         | Plat principal |
+| difficulte   | Très facile |
+| cout         | Moyen |
+| ingredients  | - 1,5 kg de poitrine de veau avec les os - 1 g... |
+| recette      | Dans une cocotte en fonte, faites chauffer l'h... |
 
-doc_id                                         recette_72303.xml  
-titre          Salade d'été au saumon fumé, feta, pommes et c...  
-type                                                      Entrée  
-difficulte                                           Très facile  
-cout                                                  Bon marché  
-ingredients    - 1 concombre - 2 carottes - 2 pommes Golden o...  
-recette        Eplucher le concombre et le détailler en laniè...
+### Exemple 2
+
+| Champ        | Valeur |
+|--------------|--------|
+| doc_id       | recette_72303.xml |
+| titre        | Salade d'été au saumon fumé, feta, pommes et c... |
+| type         | Entrée |
+| difficulte   | Très facile |
+| cout         | Bon marché |
+| ingredients  | - 1 concombre - 2 carottes - 2 pommes Golden o... |
+| recette      | Eplucher le concombre et le détailler en laniè... |
 
 ## Statistiques corpus
 
@@ -105,8 +111,6 @@ Régression Logistique avec class_weight='balanced' et une régularisation renfo
 
 ### Réflexion critique
 
-Pistes d'analyse:
-
 * La tâche est-elle bien définie ?  
 
 Oui, la tâche est clairement définie. L'objectif est de réaliser une classification automatique de textes (recettes de cuisine) en trois catégories : Entrée, Plat principal ou Dessert. 
@@ -117,12 +121,17 @@ D'après la structure du projet, non. Chaque recette est associée à une seule 
 
 * Les classes sont-elles naturellement séparables ?  
 
-Les classes ne sont pas toutes facilement séparables. Si la catégorie "Dessert" se distingue très bien grâce à un vocabulaire spécifique (sucre, chocolat), il existe une forte confusion entre les "Entrées" et les "Plats principaux". Ces deux classes partagent beaucoup de mots, ce qui rend la frontière floue pour un modèle basé uniquement sur les mots. Même pour un humain, la séparation n'est pas forcément intuitive.
+Les classes ne sont pas toutes facilement séparables. Si la catégorie "Dessert" se distingue très bien grâce à un vocabulaire spécifique (sucre, chocolat), il existe une forte confusion entre les "Entrées" et les "Plats principaux". Ces deux classes partagent beaucoup de mots, ce qui rend la frontière floue pour un modèle basé uniquement sur les mots. Même pour un humain, la séparation n'est pas forcément intuitive. Un système multi-étiquettes aurait peut-être été plus proche de la réalité culinaire.
+
+* Les caractéristiques structurelles (statistiques) sont-elles plus discriminantes que le lexique ?
+
+Nous pensions que des données numériques comme la longueur de la recette ou le nombre d’ingrédients aideraient le modèle. On s'attendait, par exemple, à ce qu'une liste d'ingrédients très courte soit un indicateur fort pour une entrée simple, ou qu'une préparation très longue pointe vers un plat principal complexe. Pourtant, le Run 4 (n-grammes seuls) reste plus performant que le Run 5 (modèle enrichi). Cela prouve que le vocabulaire et les associations de mots sont des indicateurs bien plus fiables qu'une simple mesure statistique de la structure : un bi-gramme comme "sucre vanillé" ou "pâte brisée" est plus informatif pour l'algorithme que le fait de savoir que la recette fait 120 mots. Finalement, avec 87,7 % d'accuracy, le modèle démontre qu'il n'a pas besoin de comprendre la construction d'une recette : il lui suffit de repérer des mots-clés stratégiques pour classer efficacement.
 
 * La macro-F1 est-elle la meilleure métrique ?  
 
-La Macro-F1 est une métrique très utile ici car elle donne la même importance à chaque classe, peu importe son nombre d'exemples. Comme le jeu de données est déséquilibré (beaucoup plus de plats que d'entrées), l'Accuracy peut être trompeuse en cachant les mauvaises performances sur les petites classes. La Macro-F1 permet donc de vérifier que le modèle est réellement performant sur les trois catégories, et pas seulement sur la plus nombreuse.
+La Macro-F1 est une métrique très utile ici car elle donne la même importance à chaque classe, peu importe son nombre d'exemples. Comme le jeu de données est déséquilibré (beaucoup plus de plats que d'entrées), l'Accuracy peut être trompeuse en cachant les mauvaises performances sur les petites classes. Par exemple, notre baseline 2 affichait 46,4 % d'accuracy en prédisant uniquement la classe majoritaire, ce qui la rendait totalement inutile pour les entrées ou les desserts. La Macro-F1 permet donc de vérifier que le modèle est réellement performant sur les trois catégories, et pas seulement sur la plus nombreuse. Le score de 87,5 % en Macro-F1 prouve que le modèle est capable de bien classifier les catégories sous-représentées sans qu'elles soient masquées par la classe majoritaire.
 
 * Vos modèles généralisent-ils réellement ?  
 
-Les modèles montrent une capacité de généralisation correcte car les scores sur le jeu de test restent élevés (environ 87-88 % d'Accuracy). L'utilisation de techniques comme le filtrage des mots rares (min_df=5) et la lemmatisation aide à éviter que le modèle n'apprenne les données par cœur. Cependant, la difficulté du modèle à distinguer certaines entrées des plats montre qu'il atteint une limite de généralisation sur les cas les plus ambigus.
+Les modèles montrent une capacité de généralisation correcte car les scores sur le jeu de test restent élevés (environ 82-87 % d'Accuracy). L'utilisation de techniques comme le filtrage des mots rares (min_df=5) et la lemmatisation aide à éviter que le modèle n'apprenne les données par cœur. Cependant, la difficulté du modèle à distinguer certaines entrées des plats montre qu'il atteint une limite de généralisation sur les cas les plus ambigus. D'autre part, nos modèles restent dépendants du corpus spécifique (DEFT 2013) et leurs performances chuteraient probablement face à des cuisines très différentes, comme la gastronomie moléculaire ou étrangère. Ce bon score indique que nous avons capturé la logique interne de ce jeu de données précis, mais ne garantit pas une généralisation universelle à toutes les formes de cuisine.
+
