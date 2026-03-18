@@ -6,6 +6,8 @@ MHEDHBI Khalil - MABULU Marius
 
 Le projet s'inscrit dans le cadre de la compétition DEFT 2013 et porte sur la classification thématique de documents. Plus précisément, la tâche consiste à assigner automatiquement une catégorie (Entrée, Plat principal ou Dessert) à une recette de cuisine à partir de son titre, de la liste de ses ingrédients, de ses instructions et d'autres données.
 
+**Note** : L'analyse des données et des résultats ainsi que la justification de nos choix se trouvent dans le notebook.
+
 **1 ou 2 exemples de documents**
 
 doc_id                                         recette_80405.xml  
