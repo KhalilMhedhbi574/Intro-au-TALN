@@ -6,7 +6,7 @@ MHEDHBI Khalil - MABULU Marius
 
 Le projet s'inscrit dans le cadre de la compétition DEFT 2013 et porte sur la classification thématique de documents. Plus précisément, la tâche consiste à assigner automatiquement une catégorie (Entrée, Plat principal ou Dessert) à une recette de cuisine à partir de son titre, de la liste de ses ingrédients, de ses instructions et d'autres données.
 
-1 ou 2 exemples de documents (avec leur identifiant)
+**1 ou 2 exemples de documents**
 
 doc_id                                         recette_80405.xml  
 titre                Poitrine de veau aux épices et aux abricots  
